@@ -18,8 +18,12 @@ class _MaintenanceRequestScreenState extends State<MaintenanceRequestScreen> {
   
   // Form fields state
   String? _selectedRequestType;
-  
+  String? _selectedDepartment;
+
   // Dropdown options
+  final List<String> _departments = [
+    'اداره تقنية المعلومات',
+  ];
   final List<String> _requestTypes = [
     'صيانة كهربائية',
     'صيانة سباكة',
@@ -193,6 +197,43 @@ class _MaintenanceRequestScreenState extends State<MaintenanceRequestScreen> {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'الرجاء إدخال رقم التحويلة';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Department Dropdown
+                    DropdownButtonFormField<String>(
+                      value: _selectedDepartment,
+                      style: const TextStyle(fontSize: 16, color: Colors.black),
+                      decoration: InputDecoration(
+                        labelText: 'الادارة',
+                        hintText: 'اختر الادارة',
+                        hintStyle: const TextStyle(color: Colors.grey),
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                        prefixIcon: const Icon(Icons.apartment, color: Colors.grey),
+                      ),
+                      items: _departments
+                          .map((dept) => DropdownMenuItem(
+                                value: dept,
+                                child: Text(dept, style: const TextStyle(fontSize: 16)),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedDepartment = value;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'الرجاء اختيار الادارة';
                         }
                         return null;
                       },
