@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
     ServiceCardModel(
       title: 'طلب دعم فني',
-      description: 'طلب دعم فني للمشاكل التقنية',
+      description: 'طلب دعم فني تقني',
       icon: Icons.computer,
       onTap: (BuildContext context) {
         Navigator.push(
@@ -161,12 +161,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 16),
-                    Text(
-                      'الخدمات المتاحة',
-                      style: GoogleFonts.cairo(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onSurface,
+                    ShaderMask(
+                      shaderCallback: (bounds) => const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xFF00638B), // Dark Blue
+                          Color(0xFF00A3B0), // Teal
+                        ],
+                      ).createShader(bounds),
+                      child: Text(
+                        'الخدمات المتاحة',
+                        style: GoogleFonts.cairo(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),

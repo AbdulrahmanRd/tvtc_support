@@ -36,7 +36,7 @@ class _MaintenanceRequestScreenState extends State<MaintenanceRequestScreen> {
     super.initState();
     _dateController.text = _formatDate(DateTime.now());
     // Set a default name or get it from user profile
-    _requesterNameController.text = 'مستخدم النظام'; // You can replace this with actual user name
+    _requesterNameController.text = 'عبدالرحمن'; // You can replace this with actual user name
   }
 
   String _formatDate(DateTime date) {
