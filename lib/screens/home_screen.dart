@@ -18,7 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<ServiceCardModel> services = [
     ServiceCardModel(
       title: 'طلب صيانة',
-      description: 'طلب صيانة للمرافق أو الأجهزة',
+      description: '',
       icon: Icons.build,
       onTap: (BuildContext context) {
         Navigator.push(
@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
     ServiceCardModel(
       title: 'طلب دعم فني',
-      description: 'طلب دعم فني تقني',
+      description: '',
       icon: Icons.computer,
       onTap: (BuildContext context) {
         Navigator.push(
@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
     ServiceCardModel(
       title: 'تطبيق البصمة',
-      description: 'الانتقال إلى تطبيق البصمة',
+      description: '',
       icon: Icons.fingerprint,
       onTap: (BuildContext context) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -85,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           elevation: 0,
           title: Text(
-            'نظام الدعم الفني والخدمات',
+            'نظام الخدمات الإلكترونية',
             style: GoogleFonts.cairo(
               color: Colors.white,
               fontWeight: FontWeight.bold,
