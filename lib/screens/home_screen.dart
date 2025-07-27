@@ -18,7 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<ServiceCardModel> services = [
     ServiceCardModel(
       title: 'طلب صيانة',
-      description: '',
+      description: 'إبلاغ عن أعمال صيانة',
       icon: Icons.build,
       onTap: (BuildContext context) {
         Navigator.push(
@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
     ServiceCardModel(
       title: 'طلب دعم فني',
-      description: '',
+      description: 'دعم فني للأجهزة التقنية',
       icon: Icons.computer,
       onTap: (BuildContext context) {
         Navigator.push(
@@ -39,8 +39,38 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     ),
     ServiceCardModel(
+      title: 'الموارد البشرية',
+      description: 'خدمات شؤون الموظفين',
+      icon: Icons.people,
+      onTap: (BuildContext context) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('سيتم فتح قسم الموارد البشرية')),
+        );
+      },
+    ),
+    ServiceCardModel(
+      title: 'وحدة الرقابة',
+      description: 'متابعة وتقييم الأداء',
+      icon: Icons.visibility,
+      onTap: (BuildContext context) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('سيتم فتح وحدة الرقابة')),
+        );
+      },
+    ),
+    ServiceCardModel(
+      title: 'حجز القاعات التدريبية',
+      description: 'حجز قاعات التدريب المتاحة',
+      icon: Icons.meeting_room,
+      onTap: (BuildContext context) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('سيتم فتح نظام حجز القاعات التدريبية')),
+        );
+      },
+    ),
+    ServiceCardModel(
       title: 'تطبيق البصمة',
-      description: '',
+      description: 'تسجيل الحضور والانصراف',
       icon: Icons.fingerprint,
       onTap: (BuildContext context) {
         ScaffoldMessenger.of(context).showSnackBar(
