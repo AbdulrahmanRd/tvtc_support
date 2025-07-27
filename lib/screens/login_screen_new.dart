@@ -69,6 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           'assets/images/idrwMbnV7-.svg',
                           width: 200,
                           height: 100,
+                          color: Colors.white,
                           fit: BoxFit.contain,
                         ),
                       ),
