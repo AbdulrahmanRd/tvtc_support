@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:tvtc_support/routes.dart';
+import 'package:tvtc_support/services/auth_service.dart';
 
 
 void main() async {
   // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Pre-cache any heavy resources
+  // Initialize services
   await Future.wait([
-    // Add any heavy initialization here
-    // For example: precache images, initialize services, etc.
+    // Initialize authentication service
+    AuthService.init(),
+    // Add any other service initializations here
   ]);
 
   // Run the app with error handling

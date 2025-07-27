@@ -36,6 +36,8 @@ dependencies:
   intl: 0.20.2  # For date formatting
   flutter_svg: ^2.0.10+1  # For SVG support
   google_fonts: ^6.1.0  # For custom fonts
+  http: ^1.1.0  # For making HTTP requests
+  shared_preferences: ^2.2.2  # For storing user preferences and auth state
 
 dev_dependencies:
   flutter_test:
