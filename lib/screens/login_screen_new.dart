@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter/services.dart';
-import '../services/auth_service.dart';
+import 'package:tvtc_support/services/auth_service.dart';
 
 // Color Scheme
 const Color primaryDark = Color(0xFF00638B);
@@ -23,17 +22,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
-  bool _isLoading = false;
-  final AuthService _authService = AuthService();
-
-  @override
-  void initState() {
-    super.initState();
-    // Pre-fill username if available (for demo purposes)
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _usernameController.text = 'user@mctvt.edu.sa';
-    });
-  }
 
   @override
   void dispose() {
@@ -42,48 +30,54 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  bool _isLoading = false;
+  String? _errorMessage;
+
   Future<void> _handleLogin() async {
-    if (!(_formKey.currentState?.validate() ?? false)) return;
+    if (_formKey.currentState?.validate() ?? false) {
+      setState(() => _isLoading = true);
+      _errorMessage = null;
 
-    setState(() => _isLoading = true);
+      try {
+        final authService = AuthService();
+        final result = await authService.login(
+          _usernameController.text.trim(),
+          _passwordController.text,
+        );
 
-    try {
-      final result = await _authService.login(
-        _usernameController.text.trim(),
-        _passwordController.text,
-      );
-
-      if (mounted) {
-        setState(() => _isLoading = false);
-        
-        if (result['success'] == true) {
-          // Navigate to home on success
-          if (mounted) {
+        if (mounted) {
+          if (result['success'] == true) {
             Navigator.pushReplacementNamed(context, '/home');
-          }
-        } else {
-          // Show error message
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(result['message'] ?? 'فشل تسجيل الدخول'),
-                backgroundColor: Colors.red,
-              ),
-            );
+          } else {
+            setState(() => _errorMessage = result['message']);
+            _showErrorSnackbar(_errorMessage!);
           }
         }
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('حدث خطأ غير متوقع. الرجاء المحاولة مرة أخرى'),
-            backgroundColor: Colors.red,
-          ),
-        );
+      } catch (e) {
+        _errorMessage = 'حدث خطأ غير متوقع';
+        _showErrorSnackbar(_errorMessage!);
+      } finally {
+        if (mounted) setState(() => _isLoading = false);
       }
     }
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontFamily: 'Cairo'),
+        ),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
   }
 
   @override
@@ -315,15 +309,19 @@ class _LoginScreenState extends State<LoginScreen> {
                               const SizedBox(height: 24),
                               SizedBox(
                                 width: double.infinity,
-                                height: 50,
+                                height: 52,
                                 child: ElevatedButton(
-                                  onPressed: _isLoading ? null : _handleLogin,
+                                  onPressed: _isLoading ? null : () => _handleLogin(),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: primary,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 16),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     elevation: 0,
+                                    shadowColor: Colors.transparent,
+                                    disabledBackgroundColor: primary.withOpacity(0.7),
                                   ),
                                   child: _isLoading
                                       ? const SizedBox(
@@ -331,7 +329,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           height: 24,
                                           child: CircularProgressIndicator(
                                             color: Colors.white,
-                                            strokeWidth: 2,
+                                            strokeWidth: 2.5,
                                           ),
                                         )
                                       : Text(
@@ -339,9 +337,22 @@ class _LoginScreenState extends State<LoginScreen> {
                                           style: GoogleFonts.cairo(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w700,
-                                            color: Colors.white,
                                           ),
                                         ),
+                                ),
+                              ),
+                              const SizedBox(height: 32),
+                              // Footer
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 24),
+                                child: Text(
+                                  'جميع الحقوق محفوظة © ${DateTime.now().year} تقنية المعلومات - الادارة العامة للتدريب التقني والمهني بالمدينة المنورة',
+                                  style: GoogleFonts.cairo(
+                                    fontSize: 12,
+                                    color: Colors.white.withOpacity(0.9),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                             ],

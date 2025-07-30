@@ -1,99 +1,112 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
-class AuthService {
-  static const String _baseUrl = 'YOUR_BACKEND_URL'; // Replace with your backend URL that will handle the LDAP authentication
-  static const String _authTokenKey = 'auth_token';
-  static const String _usernameKey = 'username';
-  
-  // Active Directory configuration
-  static const String _ldapServer = '172.16.16.12';
-  static const String _ldapPath = 'DC=mctvt,DC=edu,DC=sa';
-  static const String _domain = 'mctvt.edu.sa';
-  
-  // SharedPreferences instance
-  static late final SharedPreferences _prefs;
+void main() {
+  runApp(const LoginApp());
+}
 
-  // Initialize SharedPreferences
-  static Future<void> init() async {
-    _prefs = await SharedPreferences.getInstance();
+class LoginApp extends StatelessWidget {
+  const LoginApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: LoginPage(),
+      debugShowCheckedModeBanner: false,
+    );
   }
+}
 
-  // Login method
-  Future<Map<String, dynamic>> login(String username, String password) async {
-    try {
-      // In a real app, you would make an HTTP request to your backend
-      // For now, we'll simulate a successful login
-      await Future.delayed(const Duration(seconds: 2));
-      
-      // Simulate successful login
-      final token = 'simulated_token_${DateTime.now().millisecondsSinceEpoch}';
-      
-      // Store the auth token and username
-      await _prefs.setString(_authTokenKey, token);
-      await _prefs.setString(_usernameKey, username);
-      
-      return {
-        'success': true,
-        'user': {
-          'username': username,
-          'name': 'User', // You would get this from your backend
-          'email': '$username@mctvt.edu.sa',
-        },
-        'token': token,
-      };
-      
-      // Uncomment this in production to use the real API
-      /*
-      final response = await http.post(
-        Uri.parse('$_baseUrl/auth/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'username': username,
-          'password': password,
-          'ldapServer': _ldapServer,
-          'ldapPath': _ldapPath,
-          'domain': _domain,
-        }),
-      );
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data['token'] != null) {
-          await _prefs.setString(_authTokenKey, data['token']);
-          await _prefs.setString(_usernameKey, username);
-        }
-        return {'success': true, 'user': data};
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _username = TextEditingController();
+  final TextEditingController _password = TextEditingController();
+
+  String _status = '';
+  String _name = '';
+  String _role = '';
+  bool _isLoading = false;
+
+  Future<void> login() async {
+    setState(() {
+      _isLoading = true;
+      _status = '';
+      _name = '';
+      _role = '';
+    });
+
+    final url = Uri.parse('http://192.168.1.100/adapi/login.aspx'); // CHANGE IP
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'username': _username.text.trim(),
+        'password': _password.text.trim(),
+      }),
+    );
+
+    setState(() => _isLoading = false);
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+
+      if (json['success'] == true) {
+        setState(() {
+          _status = json['message'];
+          _name = json['name'];
+          _role = json['role'];
+        });
       } else {
-        return {
-          'success': false,
-          'message': 'فشل تسجيل الدخول. الرجاء التأكد من اسم المستخدم وكلمة المرور',
-        };
+        setState(() {
+          _status = json['message'];
+        });
       }
-      */
-    } catch (e) {
-      return {
-        'success': false,
-        'message': 'حدث خطأ في الاتصال بالخادم. الرجاء المحاولة مرة أخرى لاحقاً',
-      };
+    } else {
+      setState(() {
+        _status = 'خطأ في الاتصال بالسيرفر (${response.statusCode})';
+      });
     }
   }
 
-  // Check if user is logged in
-  bool get isLoggedIn {
-    return _prefs.getString(_authTokenKey) != null;
-  }
-
-  // Get auth token
-  String? get token => _prefs.getString(_authTokenKey);
-
-  // Get stored username
-  String? get username => _prefs.getString(_usernameKey);
-
-  // Logout
-  Future<void> logout() async {
-    await _prefs.remove(_authTokenKey);
-    await _prefs.remove(_usernameKey);
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('تسجيل الدخول')),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            TextField(
+              controller: _username,
+              decoration: const InputDecoration(labelText: 'اسم المستخدم'),
+            ),
+            TextField(
+              controller: _password,
+              decoration: const InputDecoration(labelText: 'كلمة المرور'),
+              obscureText: true,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _isLoading ? null : login,
+              child: _isLoading
+                  ? const CircularProgressIndicator()
+                  : const Text('تسجيل الدخول'),
+            ),
+            const SizedBox(height: 20),
+            if (_status.isNotEmpty) Text(_status, style: const TextStyle(fontSize: 16)),
+            if (_name.isNotEmpty) Text('مرحباً $_name'),
+            if (_role.isNotEmpty) Text('الدور: $_role'),
+          ],
+        ),
+      ),
+    );
   }
 }
