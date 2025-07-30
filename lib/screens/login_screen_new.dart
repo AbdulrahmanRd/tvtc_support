@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 // Color Scheme
 const Color primaryDark = Color(0xFF00638B);
@@ -29,9 +31,51 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _handleLogin() {
+  Future<bool> authenticateUser(String username, String password) async {
+    try {
+      // NOTE: Change localhost to your PC IP if running on emulator/real device
+      final url = Uri.parse('http://192.168.56.1:6001/api/adauth/login');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'username': username, 'password': password}),
+      );
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
+
+  void _handleLogin() async {
     if (_formKey.currentState?.validate() ?? false) {
-      Navigator.pushReplacementNamed(context, '/home');
+      final username = _usernameController.text.trim();
+      final password = _passwordController.text;
+      final success = await authenticateUser(username, password);
+      if (success) {
+        // Login successful
+        if (!mounted) return;
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        // Show error dialog
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('خطأ في تسجيل الدخول', style: GoogleFonts.cairo()),
+            content: Text('اسم المستخدم أو كلمة المرور غير صحيحة أو هناك مشكلة في الاتصال بالخادم.', style: GoogleFonts.cairo()),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('حسناً', style: GoogleFonts.cairo()),
+              ),
+            ],
+          ),
+        );
+      }
     }
   }
 
