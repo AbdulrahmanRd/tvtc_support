@@ -43,20 +43,13 @@ dependencies:
   flutter_dotenv: ^5.2.1  # For environment variables
   
   # Security & Authentication
-  jwt_decoder: ^2.0.1  # For JWT token validation
   encrypt: ^5.0.1  # For encryption/decryption
+  jwt_decoder: ^2.0.1  # For JWT token validation
   
   # Network & Connectivity
   connectivity_plus: ^5.0.2  # For network connectivity checks
   device_info_plus: ^10.1.0  # For device information
-  package_info_plus: ^5.0.1  # For app version info
-  
-  # Security
-  encrypt: ^5.0.1  # For encryption/decryption
-  jwt_decoder: ^2.0.1  # For JWT token validation
-  
-  # Network & Connectivity
-  connectivity_plus: ^5.0.2  # For network connectivity checks
+  package_info_plus: ^8.3.0  # For app version info
   dio: ^5.4.0  # Advanced HTTP client with interceptors
   
   # Error Handling & Logging
