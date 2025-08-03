@@ -94,6 +94,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           centerTitle: true,
           iconTheme: const IconThemeData(color: Colors.white),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout),
+              tooltip: 'العودة لتسجيل الدخول',
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/');
+              },
+            ),
+          ],
         ),
         body: SingleChildScrollView(
           child: Column(

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AdAuthApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d3a838feabe1e06fb042dd601fc6626dc53e503a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7875b39b17208d0c9f16ba15904bd14fed3a24aa")]
 [assembly: System.Reflection.AssemblyProductAttribute("AdAuthApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AdAuthApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
