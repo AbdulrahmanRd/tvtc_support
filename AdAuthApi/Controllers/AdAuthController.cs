@@ -27,7 +27,8 @@ namespace AdAuthApi.Controllers
                         {
                             return Unauthorized(new { message = "Invalid username or password." });
                         }
-                        return Ok(new { message = "Login successful." });
+                        var userName = result.Properties["cn"].Count > 0 ? result.Properties["cn"][0]?.ToString() : null;
+return Ok(new { message = "Login successful.", name = userName });
                     }
                 }
             }

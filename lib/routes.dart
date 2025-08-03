@@ -15,7 +15,16 @@ class AppRoutes {
       case login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case home:
-        return MaterialPageRoute(builder: (_) => const HomeScreen());
+        final args = settings.arguments;
+        if (args is Map && args.containsKey('userName')) {
+          return MaterialPageRoute(builder: (_) => HomeScreen(userName: args['userName']));
+        } else {
+          return MaterialPageRoute(
+            builder: (_) => Scaffold(
+              body: Center(child: Text('اسم المستخدم غير متوفر')), // User name not provided
+            ),
+          );
+        }
       case maintenance:
         return MaterialPageRoute(builder: (_) => const MaintenanceRequestScreen());
       case itSupport:

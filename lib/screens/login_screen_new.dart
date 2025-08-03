@@ -31,9 +31,8 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Future<bool> authenticateUser(String username, String password) async {
+  Future<String?> authenticateUser(String username, String password) async {
     try {
-      // NOTE: Change localhost to your PC IP if running on emulator/real device
       final url = Uri.parse('http://localhost:6001/api/adauth/login');
       final response = await http.post(
         url,
@@ -41,12 +40,13 @@ class _LoginScreenState extends State<LoginScreen> {
         body: jsonEncode({'username': username, 'password': password}),
       );
       if (response.statusCode == 200) {
-        return true;
+        final data = jsonDecode(response.body);
+        return data['name'] as String?;
       } else {
-        return false;
+        return null;
       }
     } catch (e) {
-      return false;
+      return null;
     }
   }
 
@@ -54,11 +54,15 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_formKey.currentState?.validate() ?? false) {
       final username = _usernameController.text.trim();
       final password = _passwordController.text;
-      final success = await authenticateUser(username, password);
-      if (success) {
+      final userName = await authenticateUser(username, password);
+      if (userName != null) {
         // Login successful
         if (!mounted) return;
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacementNamed(
+          context,
+          '/home',
+          arguments: {'userName': userName},
+        );
       } else {
         // Show error dialog
         if (!mounted) return;

@@ -5,7 +5,8 @@ import 'package:tvtc_support/screens/maintenance_request_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String userName;
+  const HomeScreen({super.key, required this.userName});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -13,7 +14,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  final String userName = 'عبدالرحمن';
 
   final List<ServiceCardModel> services = [
     ServiceCardModel(
@@ -153,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Text(
-                      userName,
+                      widget.userName,
                       style: GoogleFonts.cairo(
                         color: Colors.white.withOpacity(0.9),
                         fontSize: 18,
