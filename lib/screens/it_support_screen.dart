@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ITSupportScreen extends StatefulWidget {
-  const ITSupportScreen({super.key});
+  final String userName;
+  const ITSupportScreen({super.key, required this.userName});
 
   @override
   State<ITSupportScreen> createState() => _ITSupportScreenState();
@@ -53,7 +54,7 @@ class _ITSupportScreenState extends State<ITSupportScreen> {
     super.initState();
     _dateController.text = _formatDate(DateTime.now());
     // Set a default name or get it from user profile
-    _requesterNameController.text = 'عبدالرحمن'; // You can replace this with actual user name
+    _requesterNameController.text = widget.userName; // You can replace this with actual user name
   }
 
   String _formatDate(DateTime date) {
@@ -90,7 +91,7 @@ class _ITSupportScreenState extends State<ITSupportScreen> {
             ),
           ),
           title: Text(
-            'طلب صيانة',
+            'طلب دعم فني',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.bold,

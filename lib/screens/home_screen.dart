@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tvtc_support/screens/it_support_screen.dart';
 import 'package:tvtc_support/screens/maintenance_request_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart'; 
 
 class HomeScreen extends StatefulWidget {
   final String userName;
@@ -14,41 +15,65 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  late final List<ServiceCardModel> services;
 
-  final List<ServiceCardModel> services = [
-    ServiceCardModel(
-      title: 'طلب صيانة',
-      description: 'طلب صيانة للمرافق أو الأجهزة',
-      icon: Icons.build,
-      onTap: (BuildContext context) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const MaintenanceRequestScreen()),
-        );
-      },
-    ),
-    ServiceCardModel(
-      title: 'طلب دعم فني',
-      description: 'طلب دعم فني للمشاكل التقنية',
-      icon: Icons.computer,
-      onTap: (BuildContext context) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const ITSupportScreen()),
-        );
-      },
-    ),
-    ServiceCardModel(
+  @override
+  void initState() {
+    super.initState();
+    services = [
+      ServiceCardModel(
+        title: 'طلب صيانة',
+        description: 'طلب صيانة للمرافق أو الأجهزة',
+        icon: Icons.build,
+        onTap: (BuildContext context) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  MaintenanceRequestScreen(userName: widget.userName),
+            ),
+          );
+        },
+      ),
+      ServiceCardModel(
+        title: 'طلب دعم فني',
+        description: 'طلب دعم فني للمشاكل التقنية',
+        icon: Icons.computer,
+        onTap: (BuildContext context) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ITSupportScreen(userName: widget.userName),
+            ),
+          );
+        },
+      ),
+      ServiceCardModel(
       title: 'تطبيق البصمة',
       description: 'الانتقال إلى تطبيق البصمة',
       icon: Icons.fingerprint,
-      onTap: (BuildContext context) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('سيتم فتح تطبيق البصمة')),
-        );
+      onTap: (BuildContext context) async {
+        const iosUrl = 'https://apps.apple.com/sa/app/tvtc/id924938151';
+        const androidUrl = 'https://play.google.com/store/apps/details?id=com.competitivetechnology.tvtc&hl=en';
+        String url;
+        if (Theme.of(context).platform == TargetPlatform.iOS) {
+          url = iosUrl;
+        } else if (Theme.of(context).platform == TargetPlatform.android) {
+          url = androidUrl;
+        } else {
+          url = iosUrl; // Default to iOS if unknown
+        }
+        if (await canLaunchUrl(Uri.parse(url))) {
+          await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('تعذر فتح التطبيق.')),
+          );
+        }
       },
     ),
-  ];
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {

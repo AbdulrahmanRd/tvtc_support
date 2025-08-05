@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class MaintenanceRequestScreen extends StatefulWidget {
-  const MaintenanceRequestScreen({super.key});
+  final String userName;
+  const MaintenanceRequestScreen({super.key, required this.userName});
 
   @override
   State<MaintenanceRequestScreen> createState() => _MaintenanceRequestScreenState();
@@ -50,7 +51,7 @@ class _MaintenanceRequestScreenState extends State<MaintenanceRequestScreen> {
     super.initState();
     _dateController.text = _formatDate(DateTime.now());
     // Set a default name or get it from user profile
-    _requesterNameController.text = 'مستخدم النظام'; // You can replace this with actual user name
+    _requesterNameController.text = widget.userName; // You can replace this with actual user name
   }
 
   String _formatDate(DateTime date) {
@@ -131,8 +132,8 @@ class _MaintenanceRequestScreenState extends State<MaintenanceRequestScreen> {
                   children: [
                     // Requester Name (Read-only)
                     TextFormField(
-                      controller: _requesterNameController,
                       readOnly: true,
+                      controller: _requesterNameController,
                       style: const TextStyle(fontSize: 16, color: Colors.black87),
                       decoration: InputDecoration(
                         labelText: 'اسم مقدم الطلب',
