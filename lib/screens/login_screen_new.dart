@@ -33,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<String?> authenticateUser(String username, String password) async {
     try {
-      final url = Uri.parse('http://localhost:6001/api/adauth/login');
+      final url = Uri.parse('http://172.16.9.83:6001/api/adauth/login');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},

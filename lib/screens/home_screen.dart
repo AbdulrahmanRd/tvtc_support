@@ -50,19 +50,6 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       ServiceCardModel(
-        title: 'الطلبات',
-        description: 'عرض جميع الطلبات المرسلة',
-        icon: Icons.list_alt,
-        onTap: (BuildContext context) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const RequestsListScreen(),
-            ),
-          );
-        },
-      ),
-      ServiceCardModel(
       title: 'تطبيق البصمة',
       description: 'الانتقال إلى تطبيق البصمة',
       icon: Icons.fingerprint,
@@ -92,11 +79,23 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      // Handle navigation based on index if needed
+      // Handle navigation based on index
       if (index == 1) {
         // Navigate to requests screen
-      } else if (index == 2) {
-        // Navigate to profile screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const RequestsListScreen(),
+          ),
+        );
+        // Reset to home index after navigation
+        Future.delayed(Duration.zero, () {
+          if (mounted) {
+            setState(() {
+              _selectedIndex = 0;
+            });
+          }
+        });
       }
     });
   }

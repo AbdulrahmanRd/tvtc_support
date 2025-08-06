@@ -1,20 +1,21 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\mhnks\\tvtc_support\\AdAuthApi\\AdAuthApi.csproj": {}
+    "/Users/abdulrahmanalraddadi/Desktop/tvtc_support/AdAuthApi/AdAuthApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\mhnks\\tvtc_support\\AdAuthApi\\AdAuthApi.csproj": {
+    "/Users/abdulrahmanalraddadi/Desktop/tvtc_support/AdAuthApi/AdAuthApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mhnks\\tvtc_support\\AdAuthApi\\AdAuthApi.csproj",
+        "projectUniqueName": "/Users/abdulrahmanalraddadi/Desktop/tvtc_support/AdAuthApi/AdAuthApi.csproj",
         "projectName": "AdAuthApi",
-        "projectPath": "C:\\Users\\mhnks\\tvtc_support\\AdAuthApi\\AdAuthApi.csproj",
-        "packagesPath": "C:\\Users\\mhnks\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mhnks\\tvtc_support\\AdAuthApi\\obj\\",
+        "projectPath": "/Users/abdulrahmanalraddadi/Desktop/tvtc_support/AdAuthApi/AdAuthApi.csproj",
+        "packagesPath": "/Users/abdulrahmanalraddadi/.nuget/packages/",
+        "outputPath": "/Users/abdulrahmanalraddadi/Desktop/tvtc_support/AdAuthApi/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\mhnks\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "/Users/abdulrahmanalraddadi/Desktop/tvtc_support/NuGet.Config",
+          "/Users/abdulrahmanalraddadi/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -32,11 +33,6 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -45,29 +41,33 @@
           "dependencies": {
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
-              "version": "[8.0.18, )"
+              "version": "[8.0.6, )"
             },
             "Microsoft.EntityFrameworkCore.Design": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[9.0.8, )"
+              "version": "[8.0.6, )"
             },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
-              "version": "[9.0.8, )"
+              "version": "[8.0.6, )"
             },
             "Microsoft.EntityFrameworkCore.Sqlite": {
               "target": "Package",
-              "version": "[9.0.8, )"
+              "version": "[8.0.6, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
-              "version": "[6.6.2, )"
+              "version": "[6.5.0, )"
             },
             "System.DirectoryServices": {
               "target": "Package",
-              "version": "[9.0.7, )"
+              "version": "[8.0.0, )"
+            },
+            "System.DirectoryServices.Protocols": {
+              "target": "Package",
+              "version": "[8.0.0, )"
             }
           },
           "imports": [
@@ -89,7 +89,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.412/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet@8/8.0.119/libexec/sdk/8.0.119/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

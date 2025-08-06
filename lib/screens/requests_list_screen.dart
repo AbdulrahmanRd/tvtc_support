@@ -19,7 +19,7 @@ class _RequestsListScreenState extends State<RequestsListScreen> {
   }
 
   Future<List<dynamic>> _fetchRequests() async {
-    final response = await http.get(Uri.parse('http://localhost:6001/api/requests'));
+    final response = await http.get(Uri.parse('http://172.16.9.83:6001/api/requests'));
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);

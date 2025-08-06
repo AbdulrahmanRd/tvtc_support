@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using System.DirectoryServices;
+using System.DirectoryServices.Protocols;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace AdAuthApi.Controllers
@@ -11,37 +12,65 @@ namespace AdAuthApi.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest request)
         {
-            string ldapPath = "LDAP://172.16.16.12/DC=mctvt,DC=edu,DC=sa";
+            string ldapHost = "172.16.16.12";
+            int ldapPort = 389; // default LDAP port
             string domain = "mctvt.edu.sa";
-            string domainAndUsername = $"{domain}\\{request.Username}";
+            string userDn = $"{request.Username}@{domain}";
+            string searchBase = "DC=mctvt,DC=edu,DC=sa";
+
             try
             {
-                using (var entry = new DirectoryEntry(ldapPath, domainAndUsername, request.Password))
+                using (var connection = new LdapConnection(new LdapDirectoryIdentifier(ldapHost, ldapPort)))
                 {
-                    using (var searcher = new DirectorySearcher(entry))
+                    // Set connection options
+                    connection.SessionOptions.ProtocolVersion = 3; // LDAP v3
+                    connection.AuthType = AuthType.Basic;
+                    
+                    // Bind with the user credentials
+                    if (request.Password != null && request.Username != null)
                     {
-                        searcher.Filter = $"(SAMAccountName={request.Username})";
-                        searcher.PropertiesToLoad.Add("cn");
-                        var result = searcher.FindOne();
-                        if (result == null)
-                        {
-                            return Unauthorized(new { message = "Invalid username or password." });
-                        }
-                        var userName = result.Properties["cn"].Count > 0 ? result.Properties["cn"][0]?.ToString() : null;
-return Ok(new { message = "Login successful.", name = userName });
+                        var credentials = new NetworkCredential($"{request.Username}@{domain}", request.Password);
+                        connection.Bind(credentials);
                     }
+                    else
+                    {
+                        return BadRequest(new { message = "Username and password are required" });
+                    }
+
+                    // Search for the user to get CN (display name)
+                    var searchFilter = $"(sAMAccountName={request.Username})";
+                    var searchRequest = new SearchRequest(
+                        searchBase,
+                        searchFilter,
+                        SearchScope.Subtree,
+                        new[] { "cn" }
+                    );
+
+                    var searchResponse = (SearchResponse)connection.SendRequest(searchRequest);
+                    string userName = "";
+
+                    if (searchResponse.Entries.Count > 0)
+                    {
+                        var entry = searchResponse.Entries[0];
+                        if (entry.Attributes["cn"] != null && entry.Attributes["cn"].Count > 0)
+                        {
+                            userName = entry.Attributes["cn"][0].ToString();
+                        }
+                    }
+
+                    return Ok(new { message = "Login successful.", name = userName });
                 }
             }
-            catch
+            catch (DirectoryOperationException ex)
             {
-                return Unauthorized(new { message = "Invalid username or password." });
+                return Unauthorized(new { message = "Invalid username or password.", error = ex.Message });
             }
         }
-    }
 
-    public class LoginRequest
-    {
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public class LoginRequest
+        {
+            public string? Username { get; set; }
+            public string? Password { get; set; }
+        }
     }
 }
