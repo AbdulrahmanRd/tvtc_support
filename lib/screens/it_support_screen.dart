@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ITSupportScreen extends StatefulWidget {
   final String userName;
@@ -315,22 +317,52 @@ class _ITSupportScreenState extends State<ITSupportScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            // TODO: Implement form submission logic
-                            // For now, just show a success message
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('تم إرسال الطلب بنجاح'),
-                                backgroundColor: Colors.green,
-                              ),
+                            final response = await http.post(
+                              Uri.parse('http://localhost:6001/api/requests'),
+                              headers: <String, String>{
+                                'Content-Type': 'application/json; charset=UTF-8',
+                              },
+                              body: jsonEncode(<String, String?>{
+                                'requesterName': _requesterNameController.text,
+                                'department': _selectedDepartment,
+                                'officeNumber': _officeNumberController.text,
+                                'transferNumber': _transferNumberController.text,
+                                'requestType': 'IT Support',
+                                'issueType': _selectedIssueType,
+                                'description': _descriptionController.text,
+                                'date': DateTime.now().toIso8601String(),
+                              }),
                             );
-                            // Clear the form
-                            _formKey.currentState!.reset();
-                            setState(() {
-                              _selectedIssueType = null;
-                              _dateController.text = _formatDate(DateTime.now());
-                            });
+
+                            print('Response status: ${response.statusCode}');
+                            print('Response body: ${response.body}');
+
+                            if (response.statusCode == 201) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('تم إرسال الطلب بنجاح'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                              _formKey.currentState!.reset();
+                              setState(() {
+                                _selectedIssueType = null;
+                                _selectedDepartment = null;
+                                _officeNumberController.clear();
+                                _transferNumberController.clear();
+                                _descriptionController.clear();
+                                _dateController.text = _formatDate(DateTime.now());
+                              });
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('حدث خطأ أثناء إرسال الطلب'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
                           }
                         },
                         style: ElevatedButton.styleFrom(

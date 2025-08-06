@@ -3,7 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tvtc_support/screens/it_support_screen.dart';
 import 'package:tvtc_support/screens/maintenance_request_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:url_launcher/url_launcher.dart'; 
+import 'package:url_launcher/url_launcher.dart';
+import 'package:tvtc_support/screens/requests_list_screen.dart'; 
 
 class HomeScreen extends StatefulWidget {
   final String userName;
@@ -44,6 +45,19 @@ class _HomeScreenState extends State<HomeScreen> {
             context,
             MaterialPageRoute(
               builder: (context) => ITSupportScreen(userName: widget.userName),
+            ),
+          );
+        },
+      ),
+      ServiceCardModel(
+        title: 'الطلبات',
+        description: 'عرض جميع الطلبات المرسلة',
+        icon: Icons.list_alt,
+        onTap: (BuildContext context) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const RequestsListScreen(),
             ),
           );
         },
