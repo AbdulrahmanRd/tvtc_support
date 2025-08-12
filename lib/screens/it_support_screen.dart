@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ITSupportScreen extends StatefulWidget {
-  const ITSupportScreen({super.key});
+  final String userName;
+  const ITSupportScreen({super.key, required this.userName});
 
   @override
   State<ITSupportScreen> createState() => _ITSupportScreenState();
@@ -18,8 +21,27 @@ class _ITSupportScreenState extends State<ITSupportScreen> {
   
   // Form fields state
   String? _selectedIssueType;
-  
+  String? _selectedDepartment;
+
   // Dropdown options
+  final List<String> _departments = [
+    'التدريب الأهلي',
+  'مركز الأعمال وخدمة المجتمع',
+  'وحدة السكرتارية',
+  'وحدة جودة التدريب',
+  'وحدة الرقابة',
+  'نائب المدير العام',
+  'مساعد نائب المدير العام',
+  'خدمات التدريب',
+  'الخدمات المساندة',
+  'المدير العام',
+  'وحدة المراجعة الداخلية',
+  'وحدة الاتصال المؤسسي والعلاقات العامة',
+  'تقنية المعلومات',
+  'وحدة الموارد البشرية',
+  'وحدة الصحة والسلامة المهنية',
+  ];
+
   final List<String> _issueTypes = [
     'مشكلة في الشبكة',
     'مشكلة في البريد الإلكتروني',
@@ -34,7 +56,7 @@ class _ITSupportScreenState extends State<ITSupportScreen> {
     super.initState();
     _dateController.text = _formatDate(DateTime.now());
     // Set a default name or get it from user profile
-    _requesterNameController.text = 'عبدالرحمن'; // You can replace this with actual user name
+    _requesterNameController.text = widget.userName; // You can replace this with actual user name
   }
 
   String _formatDate(DateTime date) {
@@ -71,7 +93,7 @@ class _ITSupportScreenState extends State<ITSupportScreen> {
             ),
           ),
           title: Text(
-            'طلب صيانة',
+            'طلب دعم فني',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -201,6 +223,43 @@ class _ITSupportScreenState extends State<ITSupportScreen> {
                     ),
                     const SizedBox(height: 16),
 
+                    // Department Dropdown
+                    DropdownButtonFormField<String>(
+                      value: _selectedDepartment,
+                      style: const TextStyle(fontSize: 16, color: Colors.black),
+                      decoration: InputDecoration(
+                        labelText: 'الادارة',
+                        hintText: 'اختر الادارة',
+                        hintStyle: const TextStyle(color: Colors.grey),
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                        prefixIcon: const Icon(Icons.apartment, color: Colors.grey),
+                      ),
+                      items: _departments
+                          .map((dept) => DropdownMenuItem(
+                                value: dept,
+                                child: Text(dept, style: const TextStyle(fontSize: 16)),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedDepartment = value;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'الرجاء اختيار الادارة';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
                     // Date Field (Read-only, auto-filled with today's date)
                     TextFormField(
                       controller: _dateController,
@@ -258,22 +317,52 @@ class _ITSupportScreenState extends State<ITSupportScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            // TODO: Implement form submission logic
-                            // For now, just show a success message
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('تم إرسال الطلب بنجاح'),
-                                backgroundColor: Colors.green,
-                              ),
+                            final response = await http.post(
+                              Uri.parse('http://localhost:6001/api/requests'),
+                              headers: <String, String>{
+                                'Content-Type': 'application/json; charset=UTF-8',
+                              },
+                              body: jsonEncode(<String, String?>{
+                                'requesterName': _requesterNameController.text,
+                                'department': _selectedDepartment,
+                                'officeNumber': _officeNumberController.text,
+                                'transferNumber': _transferNumberController.text,
+                                'requestType': 'IT Support',
+                                'issueType': _selectedIssueType,
+                                'description': _descriptionController.text,
+                                'date': DateTime.now().toIso8601String(),
+                              }),
                             );
-                            // Clear the form
-                            _formKey.currentState!.reset();
-                            setState(() {
-                              _selectedIssueType = null;
-                              _dateController.text = _formatDate(DateTime.now());
-                            });
+
+                            print('Response status: ${response.statusCode}');
+                            print('Response body: ${response.body}');
+
+                            if (response.statusCode == 201) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('تم إرسال الطلب بنجاح'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                              _formKey.currentState!.reset();
+                              setState(() {
+                                _selectedIssueType = null;
+                                _selectedDepartment = null;
+                                _officeNumberController.clear();
+                                _transferNumberController.clear();
+                                _descriptionController.clear();
+                                _dateController.text = _formatDate(DateTime.now());
+                              });
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('حدث خطأ أثناء إرسال الطلب'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
                           }
                         },
                         style: ElevatedButton.styleFrom(

@@ -3,9 +3,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tvtc_support/screens/it_support_screen.dart';
 import 'package:tvtc_support/screens/maintenance_request_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:tvtc_support/screens/requests_list_screen.dart'; 
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String userName;
+  const HomeScreen({super.key, required this.userName});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -13,51 +16,86 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  final String userName = 'عبدالرحمن';
+  late final List<ServiceCardModel> services;
 
-  final List<ServiceCardModel> services = [
-    ServiceCardModel(
-      title: 'طلب صيانة',
-      description: 'طلب صيانة للمرافق أو الأجهزة',
-      icon: Icons.build,
-      onTap: (BuildContext context) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const MaintenanceRequestScreen()),
-        );
-      },
-    ),
-    ServiceCardModel(
-      title: 'طلب دعم فني',
-      description: 'طلب دعم فني للمشاكل التقنية',
-      icon: Icons.computer,
-      onTap: (BuildContext context) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const ITSupportScreen()),
-        );
-      },
-    ),
-    ServiceCardModel(
+  @override
+  void initState() {
+    super.initState();
+    services = [
+      ServiceCardModel(
+        title: 'طلب صيانة',
+        description: 'طلب صيانة للمرافق أو الأجهزة',
+        icon: Icons.build,
+        onTap: (BuildContext context) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  MaintenanceRequestScreen(userName: widget.userName),
+            ),
+          );
+        },
+      ),
+      ServiceCardModel(
+        title: 'طلب دعم فني',
+        description: 'طلب دعم فني للمشاكل التقنية',
+        icon: Icons.computer,
+        onTap: (BuildContext context) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ITSupportScreen(userName: widget.userName),
+            ),
+          );
+        },
+      ),
+      ServiceCardModel(
       title: 'تطبيق البصمة',
       description: 'الانتقال إلى تطبيق البصمة',
       icon: Icons.fingerprint,
-      onTap: (BuildContext context) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('سيتم فتح تطبيق البصمة')),
-        );
+      onTap: (BuildContext context) async {
+        const iosUrl = 'https://apps.apple.com/sa/app/tvtc/id924938151';
+        const androidUrl = 'https://play.google.com/store/apps/details?id=com.competitivetechnology.tvtc&hl=en';
+        String url;
+        if (Theme.of(context).platform == TargetPlatform.iOS) {
+          url = iosUrl;
+        } else if (Theme.of(context).platform == TargetPlatform.android) {
+          url = androidUrl;
+        } else {
+          url = iosUrl; // Default to iOS if unknown
+        }
+        if (await canLaunchUrl(Uri.parse(url))) {
+          await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('تعذر فتح التطبيق.')),
+          );
+        }
       },
     ),
-  ];
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      // Handle navigation based on index if needed
+      // Handle navigation based on index
       if (index == 1) {
         // Navigate to requests screen
-      } else if (index == 2) {
-        // Navigate to profile screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const RequestsListScreen(),
+          ),
+        );
+        // Reset to home index after navigation
+        Future.delayed(Duration.zero, () {
+          if (mounted) {
+            setState(() {
+              _selectedIndex = 0;
+            });
+          }
+        });
       }
     });
   }
@@ -94,6 +132,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           centerTitle: true,
           iconTheme: const IconThemeData(color: Colors.white),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout),
+              tooltip: 'العودة لتسجيل الدخول',
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/');
+              },
+            ),
+          ],
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -144,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Text(
-                      userName,
+                      widget.userName,
                       style: GoogleFonts.cairo(
                         color: Colors.white.withOpacity(0.9),
                         fontSize: 18,

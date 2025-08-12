@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:flutter/services.dart';
 
 class MaintenanceRequestScreen extends StatefulWidget {
-  const MaintenanceRequestScreen({super.key});
+  final String userName;
+  const MaintenanceRequestScreen({super.key, required this.userName});
 
   @override
   State<MaintenanceRequestScreen> createState() => _MaintenanceRequestScreenState();
@@ -18,8 +21,26 @@ class _MaintenanceRequestScreenState extends State<MaintenanceRequestScreen> {
   
   // Form fields state
   String? _selectedRequestType;
-  
+  String? _selectedDepartment;
+
   // Dropdown options
+  final List<String> _departments = [
+    'التدريب الأهلي',
+  'مركز الأعمال وخدمة المجتمع',
+  'وحدة السكرتارية',
+  'وحدة جودة التدريب',
+  'وحدة الرقابة',
+  'نائب المدير العام',
+  'مساعد نائب المدير العام',
+  'خدمات التدريب',
+  'الخدمات المساندة',
+  'المدير العام',
+  'وحدة المراجعة الداخلية',
+  'وحدة الاتصال المؤسسي والعلاقات العامة',
+  'تقنية المعلومات',
+  'وحدة الموارد البشرية',
+  'وحدة الصحة والسلامة المهنية',
+  ];
   final List<String> _requestTypes = [
     'صيانة كهربائية',
     'صيانة سباكة',
@@ -32,7 +53,7 @@ class _MaintenanceRequestScreenState extends State<MaintenanceRequestScreen> {
     super.initState();
     _dateController.text = _formatDate(DateTime.now());
     // Set a default name or get it from user profile
-    _requesterNameController.text = 'مستخدم النظام'; // You can replace this with actual user name
+    _requesterNameController.text = widget.userName; // You can replace this with actual user name
   }
 
   String _formatDate(DateTime date) {
@@ -113,8 +134,8 @@ class _MaintenanceRequestScreenState extends State<MaintenanceRequestScreen> {
                   children: [
                     // Requester Name (Read-only)
                     TextFormField(
-                      controller: _requesterNameController,
                       readOnly: true,
+                      controller: _requesterNameController,
                       style: const TextStyle(fontSize: 16, color: Colors.black87),
                       decoration: InputDecoration(
                         labelText: 'اسم مقدم الطلب',
@@ -199,6 +220,43 @@ class _MaintenanceRequestScreenState extends State<MaintenanceRequestScreen> {
                     ),
                     const SizedBox(height: 16),
 
+                    // Department Dropdown
+                    DropdownButtonFormField<String>(
+                      value: _selectedDepartment,
+                      style: const TextStyle(fontSize: 16, color: Colors.black),
+                      decoration: InputDecoration(
+                        labelText: 'الادارة',
+                        hintText: 'اختر الادارة',
+                        hintStyle: const TextStyle(color: Colors.grey),
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                        prefixIcon: const Icon(Icons.apartment, color: Colors.grey),
+                      ),
+                      items: _departments
+                          .map((dept) => DropdownMenuItem(
+                                value: dept,
+                                child: Text(dept, style: const TextStyle(fontSize: 16)),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedDepartment = value;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'الرجاء اختيار الادارة';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
                     // Date Field (Read-only, auto-filled with today's date)
                     TextFormField(
                       controller: _dateController,
@@ -256,9 +314,50 @@ class _MaintenanceRequestScreenState extends State<MaintenanceRequestScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            // TODO: Implement form submission
+                            final response = await http.post(
+                              Uri.parse('http://localhost:6001/api/requests'),
+                              headers: <String, String>{
+                                'Content-Type': 'application/json; charset=UTF-8',
+                              },
+                              body: jsonEncode(<String, String?>{
+                                'requesterName': _requesterNameController.text,
+                                'department': _selectedDepartment,
+                                'transferNumber': _transferNumberController.text,
+                                'requestType': 'Maintenance',
+                                'issueType': _selectedRequestType,
+                                'description': _descriptionController.text,
+                                'date': DateTime.now().toIso8601String(),
+                              }),
+                            );
+
+                            print('Response status: ${response.statusCode}');
+                            print('Response body: ${response.body}');
+
+                            if (response.statusCode == 201) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('تم إرسال الطلب بنجاح'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                              _formKey.currentState!.reset();
+                              setState(() {
+                                _selectedRequestType = null;
+                                _selectedDepartment = null;
+                                _transferNumberController.clear();
+                                _descriptionController.clear();
+                                _dateController.text = _formatDate(DateTime.now());
+                              });
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('حدث خطأ أثناء إرسال الطلب'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
                           }
                         },
                         style: ElevatedButton.styleFrom(

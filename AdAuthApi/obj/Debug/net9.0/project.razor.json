@@ -1,0 +1,20 @@
+{
+  "SerializedFilePath": "/Users/abdulrahmanalraddadi/Desktop/tvtc_support/AdAuthApi/obj/Debug/net9.0/project.razor.json",
+  "FilePath": "/Users/abdulrahmanalraddadi/Desktop/tvtc_support/AdAuthApi/AdAuthApi.csproj",
+  "Configuration": {
+    "ConfigurationName": "MVC-3.0",
+    "LanguageVersion": "8.0",
+    "Extensions": [
+      {
+        "ExtensionName": "MVC-3.0"
+      }
+    ]
+  },
+  "ProjectWorkspaceState": {
+    "TagHelpers": [],
+    "CSharpLanguageVersion": 1300
+  },
+  "RootNamespace": "AdAuthApi",
+  "Documents": [],
+  "SerializationFormat": "0.3"
+}
